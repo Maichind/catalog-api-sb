@@ -1,0 +1,47 @@
+PostgreSQL
+
+WITH customer_orders AS (
+    SELECT
+        o.customer_id,
+        COUNT(DISTINCT o.id)              AS order_count,
+        SUM(o.total)                      AS total_spent
+    FROM orders o
+    WHERE o.created_at >= NOW() - INTERVAL '30 days'
+      AND o.status <> 'CANCELLED'
+    GROUP BY o.customer_id
+)
+SELECT
+    c.id                                  AS customer_id,
+    c.name                                AS customer_name,
+    co.order_count,
+    co.total_spent,
+    ROUND(co.total_spent / co.order_count, 2) AS avg_ticket
+FROM customer_orders co
+JOIN customers c ON c.id = co.customer_id
+ORDER BY co.total_spent DESC
+LIMIT 5;
+
+
+OracleSQL
+WITH customer_orders AS (
+    SELECT
+        o.customer_id,
+        COUNT(DISTINCT o.id)              AS order_count,
+        SUM(o.total)                      AS total_spent
+    FROM orders o
+    WHERE o.created_at >= SYSDATE - 30
+      AND o.status <> 'CANCELLED'
+    GROUP BY o.customer_id
+)
+SELECT customer_id, customer_name, order_count, total_spent, avg_ticket FROM (
+    SELECT
+        c.id                               AS customer_id,
+        c.name                             AS customer_name,
+        co.order_count,
+        co.total_spent,
+        ROUND(co.total_spent / co.order_count, 2) AS avg_ticket
+    FROM customer_orders co
+    JOIN customers c ON c.id = co.customer_id
+    ORDER BY co.total_spent DESC
+)
+WHERE ROWNUM <= 5;

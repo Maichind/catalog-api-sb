@@ -1,0 +1,44 @@
+PostgreSQL
+
+WITH monthly_sales AS (
+    SELECT
+        oi.product_id,
+        SUM(oi.quantity) AS units_sold
+    FROM order_items oi
+    JOIN orders o ON o.id = oi.order_id
+    WHERE o.created_at >= date_trunc('month', NOW())
+    GROUP BY oi.product_id
+    HAVING SUM(oi.quantity) > 50
+)
+SELECT
+    p.name,
+    p.category,
+    p.stock,
+    ms.units_sold
+FROM products p
+JOIN monthly_sales ms ON ms.product_id = p.id
+WHERE p.stock < 10
+ORDER BY ms.units_sold DESC;
+
+
+OracleSQL
+
+WITH monthly_sales AS (
+    SELECT
+        oi.product_id,
+        SUM(oi.quantity) AS units_sold
+    FROM order_items oi
+    JOIN orders o ON o.id = oi.order_id
+    WHERE o.created_at >= TRUNC(SYSDATE, 'MM')
+    GROUP BY oi.product_id
+    HAVING SUM(oi.quantity) > 50
+)
+SELECT
+    p.name,
+    p.category,
+    p.stock,
+    ms.units_sold
+FROM products p
+JOIN monthly_sales ms ON ms.product_id = p.id
+WHERE p.stock < 10
+ORDER BY ms.units_sold DESC;

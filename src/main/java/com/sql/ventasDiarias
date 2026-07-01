@@ -1,0 +1,72 @@
+PostgreSQL
+
+WITH date_range AS (
+    SELECT generate_series(
+        CURRENT_DATE - INTERVAL '6 days',
+        CURRENT_DATE,
+        INTERVAL '1 day'
+    )::date AS sale_date
+),
+categories AS (
+    SELECT DISTINCT category FROM products
+),
+calendar AS (
+    SELECT d.sale_date, c.category
+    FROM date_range d
+    CROSS JOIN categories c
+),
+daily_sales AS (
+    SELECT
+        DATE(o.created_at)   AS sale_date,
+        p.category,
+        SUM(oi.quantity * oi.unit_price) AS revenue
+    FROM order_items oi
+    JOIN orders o   ON o.id = oi.order_id
+    JOIN products p ON p.id = oi.product_id
+    WHERE o.created_at >= CURRENT_DATE - INTERVAL '6 days'
+    GROUP BY DATE(o.created_at), p.category
+)
+SELECT
+    cal.sale_date,
+    cal.category,
+    COALESCE(ds.revenue, 0) AS revenue
+FROM calendar cal
+LEFT JOIN daily_sales ds
+    ON ds.sale_date = cal.sale_date AND ds.category = cal.category
+ORDER BY cal.sale_date, cal.category;
+
+
+OracleSQL
+
+WITH date_range AS (
+    SELECT TRUNC(SYSDATE) - LEVEL + 1 AS sale_date
+    FROM dual
+    CONNECT BY LEVEL <= 7
+),
+categories AS (
+    SELECT DISTINCT category FROM products
+),
+calendar AS (
+    SELECT d.sale_date, c.category
+    FROM date_range d
+    CROSS JOIN categories c
+),
+daily_sales AS (
+    SELECT
+        TRUNC(o.created_at) AS sale_date,
+        p.category,
+        SUM(oi.quantity * oi.unit_price) AS revenue
+    FROM order_items oi
+    JOIN orders o   ON o.id = oi.order_id
+    JOIN products p ON p.id = oi.product_id
+    WHERE o.created_at >= TRUNC(SYSDATE) - 6
+    GROUP BY TRUNC(o.created_at), p.category
+)
+SELECT
+    cal.sale_date,
+    cal.category,
+    NVL(ds.revenue, 0) AS revenue
+FROM calendar cal
+LEFT JOIN daily_sales ds
+    ON ds.sale_date = cal.sale_date AND ds.category = cal.category
+ORDER BY cal.sale_date, cal.category;
