@@ -1,22 +1,44 @@
-# CATALOG API
+# NYXN Technical Challenge — Solución Spring Boot
 
-## Descripción
+## Descripción General
 
-Este proyecto contiene la resolución de una prueba técnica implementada con Spring Boot. La solución está organizada por paquetes según el punto evaluado, permitiendo mantener separados los enfoques arquitectónicos de cada ejercicio.
+Este repositorio contiene la implementación de la prueba técnica desarrollada con **Java + Spring Boot**, cubriendo las siguientes secciones:
 
-## Estructura del proyecto
+* **Sección 1 — Java & Spring Boot**
+* **Sección 2 — Clean Architecture / Arquitectura Hexagonal**
+* **Sección 4 — Bases de Datos (PostgreSQL / OracleSQL / Redis)**
 
-```
+El proyecto está organizado intencionalmente por dominio y alcance del problema para mantener cada solución aislada, clara y fácil de revisar.
+
+---
+
+## Stack Tecnológico
+
+* Java 21
+* Spring Boot
+* Spring Data JPA
+* Bean Validation
+* PostgreSQL
+* OracleSQL
+* Redis
+* Maven
+* Swagger / OpenAPI
+
+---
+
+## Estructura del Proyecto
+
+```text
 src/main/java
 └── com
-    ├── company
+    ├── catalog
     │   └── ...
-    ├── nyxn
+    ├── orders
     │   └── ...
     └── ...
 ```
 
-```
+```text
 src/main/resources
 └── sql
     ├── postgres/
@@ -24,57 +46,136 @@ src/main/resources
     └── ...
 ```
 
+---
+
+## Desglose de la Solución
+
 ### `com.company`
 
-Implementa la solución correspondiente al **Punto 1** de la prueba técnica.
+Implementa la solución correspondiente a la **Sección 1**.
 
-Incluye la implementación de la API REST y los ejercicios relacionados con principios SOLID y buenas prácticas de desarrollo utilizando Spring Boot.
+Incluye:
 
-### `com.nyxn`
+#### Punto 1.1 — API RESTful de Productos
 
-Implementa la solución correspondiente al **Punto 2**.
+API CRUD para gestión de productos:
 
-Contiene la propuesta basada en **Clean Architecture / Arquitectura Hexagonal**, separando dominio, aplicación e infraestructura mediante puertos y adaptadores.
+* GET `/products`
+* GET `/products/{id}`
+* POST `/products`
+* PUT `/products/{id}`
+* DELETE `/products/{id}`
 
-### `resources/sql`
+Características:
 
-Contiene los scripts SQL correspondientes al **Punto 4**.
+* Paginación con `Pageable`
+* Validaciones con Bean Validation
+* Manejo global de excepciones (`@ControllerAdvice`)
+* Arquitectura por capas:
 
-Se incluyen las consultas requeridas para los diferentes motores de base de datos (PostgreSQL y Oracle), organizadas en archivos independientes para facilitar su revisión y ejecución.
+  * Controller
+  * Service
+  * Repository
+* Documentación con Swagger
 
-## Ejecución
+---
 
-Compilar el proyecto:
+#### Punto 1.2 — Refactorización aplicando SOLID
+
+Refactorización de un servicio legacy aplicando:
+
+* SRP (Single Responsibility Principle)
+* OCP (Open/Closed Principle)
+* DIP (Dependency Inversion Principle)
+* ISP (Interface Segregation Principle)
+
+La solución desacopla:
+
+* Procesamiento de pagos
+* Notificaciones por email
+* Actualización de inventario
+* Orquestación de órdenes
+
+mediante abstracciones e inyección de dependencias por constructor.
+
+---
+
+### `nyxn.orders`
+
+Implementa la solución correspondiente a la **Sección 2**.
+
+Contiene la propuesta de **Arquitectura Hexagonal (Ports & Adapters)** para la gestión de órdenes.
+
+Incluye:
+
+* Capa de dominio
+* Capa de aplicación
+* Puertos de entrada
+* Puertos de salida
+* Adaptadores primarios (REST)
+* Adaptadores secundarios (Persistencia, Email, Pub/Sub)
+
+Este módulo mantiene la lógica de negocio completamente aislada de frameworks e infraestructura.
+
+---
+
+### `com/sql`
+
+Implementa la solución correspondiente a la **Sección 4**.
+
+Contiene scripts SQL para:
+
+* PostgreSQL
+* OracleSQL
+
+Incluye:
+
+* Top clientes por volumen de compra
+* Reportes de stock crítico
+* Reportes diarios de ventas
+* Uso de CTEs
+* Funciones analíticas
+* Filtros temporales
+* Compatibilidad multi-motor
+
+---
+
+## Ejecución del Proyecto
+
+Compilar:
 
 ```bash
 ./mvnw clean install
 ```
 
-Ejecutar la aplicación:
+Ejecutar:
 
 ```bash
 ./mvnw spring-boot:run
 ```
 
-o desde el IDE ejecutando la clase principal anotada con `@SpringBootApplication`.
+O directamente desde el IDE ejecutando la clase principal anotada con `@SpringBootApplication`.
+
+---
 
 ## Notas
 
-- Cada paquete es independiente y responde al punto específico de la prueba técnica.
-- Los scripts SQL son únicamente de consulta y no forman parte del ciclo de ejecución de la aplicación.
-- La organización busca facilitar la revisión del código por parte del evaluador.
+* Cada paquete/módulo está aislado intencionalmente según el alcance de cada punto de la prueba para facilitar la evaluación.
+* Los scripts SQL son assets independientes y no forman parte del ciclo de ejecución de la aplicación.
+* Se priorizaron decisiones arquitectónicas orientadas a mantenibilidad, escalabilidad y separación de responsabilidades.
 
+---
 
 ## Nota sobre el historial de commits
 
 Por limitaciones de tiempo asociadas a la prueba técnica, se optó por consolidar toda la implementación en un único commit final.
 
-En un entorno productivo, el flujo habitual incluiría:
+En un flujo productivo habitual, el proceso incluiría:
 
-* commits atómicos por feature
-* branch strategy
-* pull requests
-* code review
-* CI/CD validations
+* Commits atómicos por funcionalidad
+* Estrategia de ramas
+* Pull Requests
+* Revisiones de código
+* Pipelines de validación CI/CD
 
-La decisión fue puramente pragmática para priorizar la entrega dentro del tiempo establecido y no representa la metodología habitual de trabajo.
+Esta decisión fue puramente pragmática para priorizar la entrega dentro del tiempo establecido y no representa mi flujo habitual de desarrollo.
