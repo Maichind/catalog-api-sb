@@ -63,3 +63,18 @@ o desde el IDE ejecutando la clase principal anotada con `@SpringBootApplication
 - Cada paquete es independiente y responde al punto específico de la prueba técnica.
 - Los scripts SQL son únicamente de consulta y no forman parte del ciclo de ejecución de la aplicación.
 - La organización busca facilitar la revisión del código por parte del evaluador.
+
+
+## Nota sobre el historial de commits
+
+Por limitaciones de tiempo asociadas a la prueba técnica, se optó por consolidar toda la implementación en un único commit final.
+
+En un entorno productivo, el flujo habitual incluiría:
+
+* commits atómicos por feature
+* branch strategy
+* pull requests
+* code review
+* CI/CD validations
+
+La decisión fue puramente pragmática para priorizar la entrega dentro del tiempo establecido y no representa la metodología habitual de trabajo.
